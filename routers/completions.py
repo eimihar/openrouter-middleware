@@ -28,13 +28,13 @@ async def chat_completions(request: Request):
     if not api_key:
         raise HTTPException(status_code=401, detail="Missing Authorization header")
     
+    is_streaming = body.get("stream", False)
+    
     balance = get_balance(api_key)
     messages = body.get("messages", [])
     body["messages"] = inject_balance_to_messages(messages, balance)
     
-    is_streaming = body.get("stream", False)
-    
-    response = call_openrouter(body, api_key)
+    response = call_openrouter(body, api_key, stream=is_streaming)
     
     if response.status_code != 200:
         raise HTTPException(status_code=response.status_code, detail=response.text)

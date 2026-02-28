@@ -1,7 +1,7 @@
 import requests
 import config
 
-def call_openrouter(body: dict, api_key: str) -> requests.Response:
+def call_openrouter(body: dict, api_key: str, stream: bool = False) -> requests.Response:
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
@@ -9,7 +9,7 @@ def call_openrouter(body: dict, api_key: str) -> requests.Response:
         "X-Title": config.APP_NAME
     }
     
-    response = requests.post(config.OPENROUTER_URL, json=body, headers=headers)
+    response = requests.post(config.OPENROUTER_URL, json=body, headers=headers, stream=stream)
     return response
 
 def get_balance(api_key: str) -> float:
