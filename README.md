@@ -24,8 +24,9 @@ Edit `.env` with your settings:
 |----------|-------------|---------|
 | `APP_NAME` | Application name for OpenRouter | My Openrouter middleware |
 | `APP_URL` | Application URL for OpenRouter referer | https://your-site.com |
+| `MANAGEMENT_KEY` | OpenRouter management key (for per-key balance) | (optional) |
 
-> **Note**: The OpenRouter API key is passed via the `Authorization` header in requests.
+> **Note**: The OpenRouter API key is passed via the `Authorization` header in requests. If `MANAGEMENT_KEY` is set, the balance will show the per-key limit remaining instead of account-level credits.
 
 ### 3. Run the Server
 

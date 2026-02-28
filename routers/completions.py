@@ -1,9 +1,24 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import StreamingResponse
 from middleware.logging import log_request
-from services.openrouter import call_openrouter
+from services.openrouter import call_openrouter, get_balance
 
 router = APIRouter()
+
+def inject_balance_to_messages(messages: list, balance: float) -> list:
+    balance_message = {
+        "role": "system",
+        "content": f"You have ${balance:.4f} USD of OpenRouter credits remaining."
+    }
+    
+    new_messages = [balance_message]
+    for msg in messages:
+        if msg.get("role") == "system":
+            msg["content"] = msg.get("content", "") + f"\n\nYou have ${balance:.4f} USD of OpenRouter credits remaining."
+        else:
+            new_messages.append(msg)
+    
+    return new_messages
 
 @router.post("/v1/chat/completions")
 async def chat_completions(request: Request):
@@ -12,6 +27,10 @@ async def chat_completions(request: Request):
     api_key = request.headers.get("Authorization", "").replace("Bearer ", "")
     if not api_key:
         raise HTTPException(status_code=401, detail="Missing Authorization header")
+    
+    balance = get_balance(api_key)
+    messages = body.get("messages", [])
+    body["messages"] = inject_balance_to_messages(messages, balance)
     
     is_streaming = body.get("stream", False)
     
